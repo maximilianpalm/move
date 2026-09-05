@@ -15,36 +15,38 @@
 <script type="application/json" id="daten">
 {
   "aktivitaeten": [
-    { "id": "spock",                "titel": "Geburt Spock",                                  "erledigt": false },
-    { "id": "ausmisten",            "titel": "Wohnung+Keller ausmisten",                      "erledigt": false },
-    { "id": "telefonat_artur",      "titel": "Telefonat mit Artur",                           "erledigt": false },
-    { "id": "kredit",               "titel": "Bestätigung zum Kreditvertrag einholen",        "erledigt": false },
-    { "id": "notar_faelligkeit",    "titel": "Fälligkeitsmeldung der Notarin",                "erledigt": false },
-    { "id": "kaufpreis_zahlen",     "titel": "Kaufpreis zahlen",                              "erledigt": false, "vorgaenger": ["notar_faelligkeit", "kredit"] },
-    { "id": "checkliste_uebergabe", "titel": "Checkliste Hausübergabe vorbereiten",           "erledigt": false, "vorgaenger": ["kaufpreis_zahlen"] },
-    { "id": "uebergabe",            "titel": "Hausübergabe durchführen",                      "erledigt": false, "vorgaenger": ["kaufpreis_zahlen", "checkliste_uebergabe"] },
-    { "id": "haus_versicherung_1",  "titel": "Übernahme der bestehenden Versicherung melden", "erledigt": false, "vorgaenger": ["uebergabe"] },
-    { "id": "haus_versicherung_2",  "titel": "Versicherung auswählen, ggf. wechseln",         "erledigt": false, "vorgaenger": ["uebergabe", "haus_versicherung_1"] },
-    { "id": "schonsteinfeger",      "titel": "Meldung beim zuständigen Schornsteinfeger",     "erledigt": false, "vorgaenger": ["uebergabe"] },
+    { "id": "spock",                "titel": "Geburt Spock",                                       "erledigt": false },
+    { "id": "ausmisten",            "titel": "Wohnung+Keller ausmisten",                           "erledigt": false },
+    { "id": "telefonat_artur",      "titel": "Telefonat mit Artur",                                "erledigt": false },
+    { "id": "kredit",               "titel": "Bestätigung zum Kreditvertrag einholen",             "erledigt": false },
+    { "id": "notar_faelligkeit",    "titel": "Fälligkeitsmeldung der Notarin",                     "erledigt": false },
+    { "id": "kaufpreis_zahlen",     "titel": "Kaufpreis zahlen",                                   "erledigt": false, "vorgaenger": ["notar_faelligkeit", "kredit"] },
+    { "id": "checkliste_uebergabe", "titel": "Checkliste Hausübergabe vorbereiten",                "erledigt": false, "vorgaenger": ["kaufpreis_zahlen"] },
+    { "id": "uebergabe",            "titel": "Hausübergabe durchführen",                           "erledigt": false, "vorgaenger": ["kaufpreis_zahlen", "checkliste_uebergabe"] },
+    { "id": "haus_versicherung_1",  "titel": "Übernahme der alten Hausversicherung melden",        "erledigt": false, "vorgaenger": ["uebergabe"] },
+    { "id": "haus_versicherung_2",  "titel": "Versicherung auswählen, ggf. wechseln",              "erledigt": false, "vorgaenger": ["uebergabe", "haus_versicherung_1"] },
+    { "id": "schonsteinfeger",      "titel": "Meldung beim zuständigen Schornsteinfeger",          "erledigt": false, "vorgaenger": ["uebergabe"] },
      
-    { "id": "kita_neu_finden",      "titel": "Neue Kita für auswählen",                        "erledigt": false },
-    { "id": "kita_zusage",          "titel": "Zusage der neuen Kita",                          "erledigt": false, "vorgaenger": ["kita_neu_finden", "kredit", "notar_faelligkeit"] },
-    { "id": "kita_alt",             "titel": "Alte Kita kündigen",                             "erledigt": false, "vorgaenger": ["kita_zusage"] },
+    { "id": "kita_neu_finden",      "titel": "Neue Kita für auswählen",                             "erledigt": false },
+    { "id": "kita_zusage",          "titel": "Zusage der neuen Kita",                               "erledigt": false, "vorgaenger": ["kita_neu_finden", "kredit", "notar_faelligkeit"] },
+    { "id": "kita_alt",             "titel": "Alte Kita kündigen",                                  "erledigt": false, "vorgaenger": ["kita_zusage"] },
 
-    { "id": "umzug_sicher",         "titel": "Umzug ist sicher und terminiert",                "erledigt": false, "vorgaenger": ["kredit", "notar_faelligkeit", "kita_zusage"] },
-    { "id": "kuend_wohnung",        "titel": "Aktuelle Wohnung kündigen",                      "erledigt": false, "vorgaenger": ["umzug_sicher"] },
-    { "id": "umzugsfirma",          "titel": "Umzugsunternehmen beauftragen",                  "erledigt": false, "vorgaenger": ["umzug_sicher"] },
+    { "id": "umzug_sicher",         "titel": "Umzug ist sicher und terminiert",                     "erledigt": false, "vorgaenger": ["kredit", "notar_faelligkeit", "kita_zusage"] },
+    { "id": "kuend_wohnung",        "titel": "Aktuelle Wohnung kündigen",                           "erledigt": false, "vorgaenger": ["umzug_sicher"] },
+    { "id": "umzugsfirma",          "titel": "Umzugsunternehmen beauftragen",                       "erledigt": false, "vorgaenger": ["umzug_sicher"] },
 
-    { "id": "begehung",             "titel": "Wohnung mit Vermieter begehen",                  "erledigt": false },
-    { "id": "ausbessern",           "titel": "Alte Wohnung ausbessern neues Haus",             "erledigt": false, "vorgaenger": ["kuend_wohnung", "begehung"] },
+    { "id": "begehung",             "titel": "Wohnung mit Vermieter begehen",                       "erledigt": false },
+    { "id": "ausbessern",           "titel": "Alte Wohnung ausbessern neues Haus",                  "erledigt": false, "vorgaenger": ["kuend_wohnung", "begehung"] },
 
-    { "id": "kisten_packen",        "titel": "Kisten packen",                                  "erledigt": false, "vorgaenger": ["ausmisten"] },
-    { "id": "umzug",                "titel": "Umzug durchführen",                              "erledigt": false, "vorgaenger": ["umzugsfirma", "kisten_packen"] },
-    { "id": "nachsende",            "titel": "Nachsendeauftrag einrichten",                    "erledigt": false, "vorgaenger": ["umzug"] },
-    { "id": "ummelden",             "titel": "Ummelden beim Einwohnermeldeamt",                "erledigt": false, "vorgaenger": ["umzug"] },
-    { "id": "adresse_mitteilen",    "titel": "Neue Adresse mitteilen (Notarin und alle anderen)", "erledigt": false, "vorgaenger": ["umzug"] },
-    { "id": "jka_meldung",          "titel": "Meldebescheinigung an 'Jung kauft Alt' senden",  "erledigt": false, "vorgaenger": ["umzug"] },
-    { "id": "jka_kind",             "titel": "Geburtsurkunde an 'Jung kauft Alt' senden",      "erledigt": false, "vorgaenger": ["spock"] }
+    { "id": "betreuung_lucia",      "titel": "Betreuung für Lucia während des Umzugs organisieren", "erledigt": false, "vorgaenger": ["umzugsfirma"] },
+    { "id": "betreuung_simon",      "titel": "Betreuung für Simon während des Umzugs organisieren", "erledigt": false, "vorgaenger": ["umzugsfirma"] },
+    { "id": "kisten_packen",        "titel": "Kisten packen",                                       "erledigt": false, "vorgaenger": ["ausmisten", "betreuung_simon"] },
+    { "id": "umzug",                "titel": "Umzug durchführen",                                   "erledigt": false, "vorgaenger": ["umzugsfirma", "kisten_packen", "betreuung_lucia"] },
+    { "id": "nachsende",            "titel": "Nachsendeauftrag einrichten",                         "erledigt": false, "vorgaenger": ["umzug"] },
+    { "id": "ummelden",             "titel": "Ummelden beim Einwohnermeldeamt",                     "erledigt": false, "vorgaenger": ["umzug"] },
+    { "id": "adresse_mitteilen",    "titel": "Neue Adresse mitteilen (Notarin und alle anderen)",   "erledigt": false, "vorgaenger": ["umzug"] },
+    { "id": "jka_meldung",          "titel": "Meldebescheinigung an 'Jung kauft Alt' senden",       "erledigt": false, "vorgaenger": ["umzug"] },
+    { "id": "jka_kind",             "titel": "Geburtsurkunde an 'Jung kauft Alt' senden",           "erledigt": false, "vorgaenger": ["spock"] }
   ]
 }
 </script>
