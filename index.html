@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ablaufdiagramm</title>
+
+<!-- ============================================================
+     HIER die Aktivitäten pflegen.
+     id         : eindeutiger Schlüssel
+     titel      : Text im Kästchen
+     vorgaenger : Liste von ids, die vorher fertig sein müssen (optional)
+     erledigt   : Startstatus - true = erledigt, false = offen
+     ============================================================ -->
+<script type="application/json" id="daten">
+{
+  "aktivitaeten": [
+    { "id": "kredit",        "titel": "Kreditzusage der Bank einholen",        "erledigt": true  },
+    { "id": "notar",         "titel": "Bestätigung der Notarin zum Hauskauf",  "erledigt": false },
+    { "id": "kaufvertrag",   "titel": "Kaufvertrag unterschreiben",            "erledigt": false, "vorgaenger": ["kredit", "notar"] },
+    { "id": "kuend_wohnung", "titel": "Aktuelle Wohnung kündigen",             "erledigt": false, "vorgaenger": ["kaufvertrag"] },
+
+    { "id": "kita_neu",      "titel": "Neue Kita für die Tochter finden",      "erledigt": false },
+    { "id": "kita_zusage",   "titel": "Zusage der neuen Kita",                 "erledigt": false, "vorgaenger": ["kita_neu"] },
+    { "id": "kita_alt",      "titel": "Alte Kita kündigen",                    "erledigt": false, "vorgaenger": ["kita_zusage"] },
+
+    { "id": "umzugsfirma",   "titel": "Umzugsunternehmen beauftragen",         "erledigt": false, "vorgaenger": ["kaufvertrag"] },
+    { "id": "renovierung",   "titel": "Renovierung neues Haus",                "erledigt": false, "vorgaenger": ["kaufvertrag"] },
+    { "id": "umzug",         "titel": "Umzugstag",                             "erledigt": false, "vorgaenger": ["kuend_wohnung", "umzugsfirma", "renovierung"] },
+    { "id": "ummelden",      "titel": "Ummelden beim Einwohnermeldeamt",       "erledigt": false, "vorgaenger": ["umzug"] },
+    { "id": "nachsende",     "titel": "Nachsendeauftrag einrichten",           "erledigt": false, "vorgaenger": ["ummelden"] }
+  ]
+}
+</script>
+
+<style>
+  :root {
+    --fg: #ffffff;
+    --bg: #000000;
+    --done: #545454;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #buehne {
+    position: relative;
+    width: max-content;
+    min-width: 100%;
+    min-height: 100vh;
+    padding: 48px;
+  }
+  #pfeile {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+  #raster {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 90px;
+    width: max-content;
+    min-height: calc(100vh - 96px);
+  }
+  .spalte {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 26px;
+  }
+  .aktivitaet {
+    position: relative;
+    width: 210px;
+    min-height: 64px;
+    padding: 12px 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1.5px solid var(--fg);
+    border-radius: 14px;
+    color: var(--fg);
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 400;
+    cursor: pointer;
+    user-select: none;
+    background: transparent;
+    transition: color .15s, border-color .15s;
+  }
+  .aktivitaet:focus-visible { outline: 2px dashed var(--fg); outline-offset: 3px; }
+
+  /* Erledigt oder noch nicht an der Reihe: gedaempft.
+     Nur wirklich aktive Aktivitaeten bleiben weiss. */
+  .aktivitaet.gedimmt {
+    color: var(--done);
+    border-color: var(--done);
+  }
+
+  /* Haken unten rechts, nur bei erledigten Aktivitaeten */
+  .aktivitaet.erledigt::after {
+    content: "\2611";                       /* U+2611 &#x2611; */
+    position: absolute;
+    right: 8px;
+    bottom: 3px;
+    font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "DejaVu Sans", sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--done);
+  }
+</style>
+</head>
+<body>
+<div id="buehne">
+  <svg id="pfeile">
+    <defs>
+      <marker id="spitze-hell" viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffffff"></path>
+      </marker>
+      <marker id="spitze-grau" viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#545454"></path>
+      </marker>
+    </defs>
+  </svg>
+  <div id="raster"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var daten = JSON.parse(document.getElementById("daten").textContent);
+  var liste = daten.aktivitaeten || [];
+
+  var nachId = {};
+  liste.forEach(function (a) {
+    a.vorgaenger = (a.vorgaenger || []).slice();
+    a.erledigt = a.erledigt === true;
+    nachId[a.id] = a;
+  });
+  // unbekannte Vorgänger ignorieren
+  liste.forEach(function (a) {
+    a.vorgaenger = a.vorgaenger.filter(function (v) { return nachId[v]; });
+  });
+
+  // ---- Ebene (Spalte) je Aktivität: längster Weg von einer Wurzel ----
+  var ebene = {};
+  function berechneEbene(a, pfad) {
+    if (ebene[a.id] !== undefined) return ebene[a.id];
+    if (pfad[a.id]) return 0;              // Zyklus abfangen
+    pfad[a.id] = true;
+    var e = 0;
+    a.vorgaenger.forEach(function (v) {
+      e = Math.max(e, berechneEbene(nachId[v], pfad) + 1);
+    });
+    delete pfad[a.id];
+    ebene[a.id] = e;
+    return e;
+  }
+  liste.forEach(function (a) { berechneEbene(a, {}); });
+
+  var spalten = [];
+  liste.forEach(function (a) {
+    var e = ebene[a.id];
+    (spalten[e] = spalten[e] || []).push(a);
+  });
+
+  // ---- Reihenfolge innerhalb der Spalten: nah an den Vorgängern ----
+  var zeile = {};
+  spalten.forEach(function (spalte, i) {
+    if (i > 0) {
+      spalte.sort(function (a, b) {
+        return mittelwert(a) - mittelwert(b);
+      });
+    }
+    spalte.forEach(function (a, j) { zeile[a.id] = j; });
+  });
+  function mittelwert(a) {
+    var werte = a.vorgaenger
+      .map(function (v) { return zeile[v]; })
+      .filter(function (z) { return z !== undefined; });
+    if (!werte.length) return 999;
+    return werte.reduce(function (s, z) { return s + z; }, 0) / werte.length;
+  }
+
+  // ---- DOM aufbauen ----
+  var raster = document.getElementById("raster");
+  var svg = document.getElementById("pfeile");
+  var kaesten = {};
+
+  spalten.forEach(function (spalte) {
+    var sp = document.createElement("div");
+    sp.className = "spalte";
+    spalte.forEach(function (a) {
+      var k = document.createElement("div");
+      k.className = "aktivitaet";
+      k.textContent = a.titel;
+      k.tabIndex = 0;
+      k.addEventListener("click", function () { umschalten(a); });
+      k.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); umschalten(a); }
+      });
+      kaesten[a.id] = k;
+      sp.appendChild(k);
+    });
+    raster.appendChild(sp);
+  });
+
+  function umschalten(a) {
+    a.erledigt = !a.erledigt;
+    zeichnen();
+  }
+
+  function istAktiv(a) {
+    if (a.erledigt) return false;
+    return a.vorgaenger.every(function (v) { return nachId[v].erledigt; });
+  }
+
+  // ---- Zustand + Pfeile zeichnen ----
+  function zeichnen() {
+    liste.forEach(function (a) {
+      var k = kaesten[a.id];
+      k.classList.toggle("erledigt", a.erledigt);
+      k.classList.toggle("gedimmt", !istAktiv(a));
+    });
+
+    // alte Pfade entfernen
+    Array.prototype.slice.call(svg.querySelectorAll("path.verbindung"))
+      .forEach(function (p) { p.remove(); });
+
+    var buehne = document.getElementById("buehne");
+    var basis = buehne.getBoundingClientRect();
+    var breite = buehne.scrollWidth, hoehe = buehne.scrollHeight;
+    svg.setAttribute("width", breite);
+    svg.setAttribute("height", hoehe);
+    svg.setAttribute("viewBox", "0 0 " + breite + " " + hoehe);
+
+    liste.forEach(function (a) {
+      a.vorgaenger.forEach(function (vid) {
+        var von = kaesten[vid].getBoundingClientRect();
+        var nach = kaesten[a.id].getBoundingClientRect();
+        var x1 = von.right - basis.left + buehne.scrollLeft;
+        var y1 = von.top + von.height / 2 - basis.top + buehne.scrollTop;
+        var x2 = nach.left - basis.left + buehne.scrollLeft - 6;
+        var y2 = nach.top + nach.height / 2 - basis.top + buehne.scrollTop;
+        var dx = Math.max(30, (x2 - x1) / 2);
+
+        var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("class", "verbindung");
+        p.setAttribute("d", "M " + x1 + " " + y1 +
+                            " C " + (x1 + dx) + " " + y1 +
+                            ", " + (x2 - dx) + " " + y2 +
+                            ", " + x2 + " " + y2);
+        p.setAttribute("fill", "none");
+        var grau = !istAktiv(nachId[vid]);
+        p.setAttribute("stroke", grau ? "#545454" : "#ffffff");
+        p.setAttribute("stroke-width", "1.5");
+        p.setAttribute("marker-end", grau ? "url(#spitze-grau)" : "url(#spitze-hell)");
+        svg.appendChild(p);
+      });
+    });
+  }
+
+  zeichnen();
+  window.addEventListener("resize", zeichnen);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(zeichnen);
+})();
+</script>
+</body>
+</html>
