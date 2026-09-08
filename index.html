@@ -18,8 +18,8 @@
     { "id": "spock",                "titel": "Geburt Spock",                                       "erledigt": false },
     { "id": "ausmisten",            "titel": "Wohnung+Keller ausmisten",                           "erledigt": false },
     { "id": "telefonat_artur",      "titel": "Telefonat mit Artur",                                "erledigt": false },
-    { "id": "kredit",               "titel": "Bestätigung zum Kreditvertrag einholen",             "erledigt": false },
-    { "id": "notar_faelligkeit",    "titel": "Fälligkeitsmeldung der Notarin",                     "erledigt": false },
+    { "id": "kredit",               "titel": "Bestätigung zum Kreditvertrag einholen",             "erledigt": true },
+    { "id": "notar_faelligkeit",    "titel": "Fälligkeitsmeldung der Notarin",                     "erledigt": true },
     { "id": "kaufpreis_zahlen",     "titel": "Kaufpreis zahlen",                                   "erledigt": false, "vorgaenger": ["notar_faelligkeit", "kredit"] },
     { "id": "checkliste_uebergabe", "titel": "Checkliste Hausübergabe vorbereiten",                "erledigt": false, "vorgaenger": ["kaufpreis_zahlen"] },
     { "id": "uebergabe",            "titel": "Hausübergabe durchführen",                           "erledigt": false, "vorgaenger": ["kaufpreis_zahlen", "checkliste_uebergabe"] },
@@ -27,7 +27,7 @@
     { "id": "haus_versicherung_2",  "titel": "Versicherung auswählen, ggf. wechseln",              "erledigt": false, "vorgaenger": ["uebergabe", "haus_versicherung_1"] },
     { "id": "schonsteinfeger",      "titel": "Meldung beim zuständigen Schornsteinfeger",          "erledigt": false, "vorgaenger": ["uebergabe"] },
 
-    { "id": "arbeite_32h",          "titel": "Max Arbeitszeiterhöhung beantragen (32h)",           "erledigt": false },
+    { "id": "arbeite_32h",          "titel": "Max Arbeitszeiterhöhung beantragen (32h)",           "erledigt": true },
      
     { "id": "kita_neu_finden",      "titel": "Neue Kita für auswählen",                             "erledigt": false },
     { "id": "kita_zusage",          "titel": "Platz in der neuen Kita sichern",                     "erledigt": false, "vorgaenger": ["kita_neu_finden", "kredit", "notar_faelligkeit", "arbeite_32h"] },
